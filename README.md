@@ -58,7 +58,7 @@ MATLAB 2023a or a compatible release is required for the supplied rPPG ROI and t
 
 ```text
 alive/
-  mtcn.py                    paper-aligned M-TCN blocks
+  mtcn.py                    M-TCN blocks
   models.py                  teacher and student architectures
   losses.py                  L_F and L_DF
   train_teacher.py           PPG teacher training
