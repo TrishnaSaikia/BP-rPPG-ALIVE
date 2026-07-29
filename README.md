@@ -157,7 +157,7 @@ python preprocessing/python/validate_processed_data.py teacher \
 
 # Step 2: Train the PPG teacher
 
-The paper pretrains `N_PPG` on the combined PPG data and then freezes it during ALIVE training.
+The paper pretrains `N_PPG` on the combined PPG data and then freezes it during `N_rPPG` training.
 
 ```bash
 python -m alive.train_teacher \
@@ -175,8 +175,6 @@ runs/teacher/
   subject_split.json
   training_history.json
 ```
-
-The teacher checkpoint is generated locally and is not supplied in the repository.
 
 # Step 3: Prepare rPPG student inputs
 
@@ -232,7 +230,7 @@ processed/student/HQ/4_sec/subject_001/
   metadata.csv
 ```
 
-The final incomplete portion of a video is discarded. For a 90-second recording, 22 complete 4-second clips are retained and the last 2 seconds are not used.
+To reduce noise, the first and last 10 seconds of each video are excluded. From the remaining 70 seconds, 17 complete non-overlapping 4-second clips are retained, while the final 2 seconds are discarded.
 
 ## 3.4 Match synchronized PPG clips
 
@@ -279,7 +277,7 @@ During training:
 - SBP and DBP are supervised using `L_DF`;
 - Adam is used for up to 20 epochs, batch size 4, learning rate `1e-4`.
 
-The subject split is approximately 80%/10%/10% and is saved for reproducibility.
+The subject split is approximately 80%/10%/10%.
 
 # Step 5: Test the student only
 
@@ -312,22 +310,13 @@ results/HQ/
   metrics.json
 ```
 
-# Paper-aligned architecture
+# Model Architecture
 
-Both networks use the released M-TCN implementation:
+ALIVE uses two M-TCN-based networks: a PPG teacher network and an rPPG student network. The teacher learns BP-related features from contact PPG signals and guides the student during training. The student estimates SBP and DBP from facial-video-based rPPG signals.
 
-- input size `K x L` for the student and `1 x L` for the teacher;
-- three causal convolutions per dilation block;
-- five filters of size `1 x 3`;
-- chomp, ReLU and dropout after each convolution;
-- residual connection and downsampling projection;
-- dilations `1, 2, 4, ..., 2^floor(log2(L))`;
-- final `K x L` map projected to a `1 x L` feature representation;
-- MLP prediction of SBP and DBP.
+During testing, only the student network is used.
 
-For four-second inputs at 30 Hz/fps, `L=120` and the dilation sequence is `1, 2, 4, 8, 16, 32, 64`.
-
-Details that are not numerically stated in the manuscript are isolated in configuration files and documented in [Implementation notes](docs/IMPLEMENTATION_NOTES.md).
+Further architectural and configuration details are provided in the [Implementation Notes](docs/IMPLEMENTATION_NOTES.md).
 
 ## Run repository tests
 
