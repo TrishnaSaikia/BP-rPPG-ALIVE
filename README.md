@@ -9,7 +9,7 @@ This repository provides instructions to access the BP-rPPG dataset and the impl
 ALIVE uses two networks:
 
 - `N_PPG`: a teacher network trained using 4-second contact PPG signals to estimate blood pressure.
-- `N_rPPG`: a student network that estimates blood pressure from facial videos. During training, it learns with guidance from the synchronized PPG teacher.
+- `N_rPPG`: a student network that estimates blood pressure from facial videos. During training, it learns with guidance from the PPG network.
 
 During student training, the teacher network remains frozen. It extracts the PPG feature `F_p`, while the student network extracts the rPPG feature `F_r`. The student is trained using:
 
