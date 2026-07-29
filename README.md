@@ -62,8 +62,8 @@ alive/
   models.py                  teacher and student architectures
   losses.py                  L_F and L_DF
   train_teacher.py           PPG teacher training
-  train_student.py           teacher-guided ALIVE training
-  test_student.py            student-only testing and fusion
+  train_student.py           PPG-guided ALIVE training
+  test_student.py            rPPG-only testing and fusion
   data.py                    strict processed-data loaders and splits
   metrics.py                 MAE, ME, STD and quality fusion
 
