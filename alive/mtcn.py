@@ -1,6 +1,4 @@
-"""Paper-aligned modified temporal convolutional network (M-TCN).
-
-The accepted paper describes the following operations:
+"""Modified temporal convolutional network (M-TCN).
 
 * input temporal map of size K x L;
 * one dilation block for dilation 1, followed by blocks with dilations
@@ -10,11 +8,7 @@ The accepted paper describes the following operations:
 * chomp, ReLU, dropout, a residual/skip path, and a downsampling layer;
 * final K x L map projected by a dense layer with L neurons to a 1 x L
   BP-relevant feature representation.
-
-The paper does not state the exact operator used by the block's downsampling
-layer. Here it is implemented as a 1 x 1 channel projection from the five
-internal feature maps back to one map. This preserves the K x L dimensions
-reported between successive dilation blocks.
+  
 """
 
 from __future__ import annotations
