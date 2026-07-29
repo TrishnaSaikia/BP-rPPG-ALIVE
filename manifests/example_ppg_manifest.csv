@@ -1,0 +1,4 @@
+dataset,subject_id,video_id,signal_path,sampling_rate,sbp,dbp,signal_column
+BP-rPPG,subject_001,subject_001,data/bp_rppg/subject_001_ppg.csv,100,120,80,0
+MSPM,P001,hand_raise,data/mspm/P001_ppg.csv,256,118,77,PPG
+MIMIC-II,record_0001,segment_01,data/mimic/record_0001.npy,125,132,84,0
