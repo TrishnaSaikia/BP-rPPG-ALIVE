@@ -91,7 +91,6 @@ All PPG recordings from BP-rPPG, MIMIC-II, MSPM, or another permitted source mus
 
 - non-overlapping 4-second clips;
 - one common sampling frequency;
-- the same number of input samples.
 
 The repository default is **30 Hz**, producing `4 x 30 = 120` samples per clip. This matches the 30 fps rPPG clips and gives teacher/student feature representations of equal length.
 
