@@ -1,7 +1,7 @@
 function [rois, grid_shapes] = define_face_rois(landmarks, frame_size, block_size, fixed_grid_shapes)
-%DEFINE_FACE_ROIS Define paper ROIs and a non-overlapping block grid.
+%DEFINE_FACE_ROIS Define ROIs and a non-overlapping block grid.
 %
-% The accepted paper uses forehead, cheek and chin facial regions while
+% We use forehead, cheek and chin facial regions while
 % excluding eye and mouth areas. Each ROI is represented by the minimum
 % enclosing rectangle of its MediaPipe landmarks. The rectangle is divided
 % into non-overlapping blocks.
