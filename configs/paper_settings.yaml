@@ -3,6 +3,9 @@
 preprocessing:
   clip_seconds: 4
   video_fps: 30
+  trim_start_seconds: 10
+  trim_end_seconds: 10
+  clips_per_90_second_recording: 17
   ppg_target_sampling_rate: 30
   samples_per_clip: 120
   non_overlapping_clips: true
@@ -10,6 +13,7 @@ preprocessing:
   k_signals: 15
   quality_frequency_band_hz: [0.7, 4.0]
   quality_window_bins: 3
+
 
 architecture:
   convolution_filters: 5
