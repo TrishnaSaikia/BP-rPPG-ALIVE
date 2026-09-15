@@ -19,7 +19,7 @@ function process_video(video_path, landmarks_csv, output_dir, dataset_name, subj
 %   metadata.csv     - information used to match synchronized PPG clips
 
     if nargin < 10 || isempty(block_size)
-        block_size = [20 20];
+        block_size = [7 7];
     end
 
     clip_seconds = 4;
