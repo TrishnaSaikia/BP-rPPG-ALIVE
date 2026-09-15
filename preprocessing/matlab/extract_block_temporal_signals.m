@@ -6,7 +6,7 @@ function Xi = extract_block_temporal_signals(video_path, landmarks, start_frame,
 % block has a consistent temporal identity while its pixel location follows
 % facial movement.
 
-    if nargin < 5 || isempty(block_size), block_size = [20 20]; end
+    if nargin < 5 || isempty(block_size), block_size = [7 7]; end
     end_frame = start_frame + num_frames - 1;
     if end_frame > size(landmarks, 1)
         error('Requested clip exceeds available landmark rows.');
