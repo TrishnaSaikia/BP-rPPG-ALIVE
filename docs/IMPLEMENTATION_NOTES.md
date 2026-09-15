@@ -21,7 +21,9 @@ They can be changed without editing model code. Replace these defaults with the 
 
 ## ROI landmark indices and block size
 
-The paper specifies forehead, cheek and chin regions, minimum enclosing rectangles, exclusion of eye/mouth areas, and non-overlapping blocks, but does not list the exact MediaPipe landmark indices or pixel block dimensions. The released MATLAB implementation provides explicit landmark sets and a default `20 x 20` pixel block size. These choices are isolated in `define_face_rois.m` and the call to `process_video.m`.
+## ROI landmark indices and block size
+
+The paper specifies forehead, cheek and chin regions, minimum enclosing rectangles, exclusion of eye and mouth areas, and division into non-overlapping blocks. The ROI block size used in the reported experiments was `7 × 7` pixels. 
 
 ## Checkpoints
 
