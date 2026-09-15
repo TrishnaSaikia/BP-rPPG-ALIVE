@@ -87,22 +87,27 @@ configs/
 
 # Step 1: Prepare the PPG datasets
 
-All PPG recordings from BP-rPPG, MIMIC-II, MSPM, or another permitted source must be converted into:
+All PPG recordings from BP-rPPG, MIMIC-II, MSPM, or another
+Permitted sources are converted into:
 
 - non-overlapping 4-second clips;
-- one common sampling frequency;
+- a common target sampling frequency of 30 Hz.
 
-The repository default is **30 Hz**, producing `4 x 30 = 120` samples per clip. This matches the 30 fps rPPG clips and gives teacher/student feature representations of equal length.
+For BP-rPPG, the `Wave` column in each `<subject>_U_wave.csv` file contains
+the raw pulse waveform exported by the pulse-oximeter software. The waveform
+is treated as being sampled at approximately 60 Hz and is resampled to
+30 Hz. Therefore, every 4-second processed clip contains
+`4 × 30 = 120` samples.
 
 ## 1.1 Create a PPG manifest
 
 Create `manifests/teacher_ppg.csv` with one row per source recording:
 
 ```csv
-dataset,subject_id,video_id,signal_path,sampling_rate,sbp,dbp,signal_column
-BP-rPPG,subject_001,subject_001,data/bp_rppg/subject_001_ppg.csv,100,120,80,0
-MSPM,P001,hand_raise,data/mspm/P001_ppg.csv,256,118,77,PPG
-MIMIC-II,record_0001,segment_01,data/mimic/record_0001.npy,125,132,84,0
+dataset,subject_id,video_id,signal_path,sampling_rate,sbp,dbp,signal_column,has_header
+BP-rPPG,subject_001,subject_001,data/bp_rppg/subject_001_U_wave.csv,60,120,80,Wave,true
+MSPM,P001,hand_raise,data/mspm/P001_ppg.csv,256,118,77,PPG,true
+MIMIC-II,record_0001,segment_01,data/mimic/record_0001.npy,125,132,84,0,false
 ```
 
 Required columns:
@@ -207,7 +212,7 @@ process_video(...
     'landmarks/HQ/subject_001.csv', ...
     'processed/student/HQ/4_sec/subject_001', ...
     'BP-rPPG', 'subject_001', 'subject_001', 'HQ', ...
-    120, 80, [20 20]);
+    120, 80, [7 7]);
 ```
 
 The pipeline follows the paper:
@@ -229,7 +234,7 @@ processed/student/HQ/4_sec/subject_001/
   labels.csv          # N x 2
   metadata.csv
 ```
-
+The ROI block size used for the reported experiments is `7 × 7` pixels.
 To reduce noise, the first and last 10 seconds of each video are excluded. From the remaining 70 seconds, 17 complete non-overlapping 4-second clips are retained, while the final 2 seconds are discarded.
 
 ## 3.4 Match synchronized PPG clips
