@@ -9,14 +9,14 @@ function [rois, grid_shapes] = define_face_rois(landmarks, frame_size, block_siz
 % landmarks         : 468 x 2 MediaPipe pixel coordinates for one frame
 % frame_size         : [height width]
 % block_size         : desired [height width] used to determine the grid on
-%                      the first valid frame (default [20 20])
+%                      the first valid frame (default [7 7])
 % fixed_grid_shapes  : optional R x 2 [rows cols]. When supplied, the same
 %                      grid count is retained while the ROI follows landmarks
 %                      in later frames.
 %
 % rois fields: name, bbox [x1 y1 x2 y2], blocks [x1 y1 x2 y2]
 
-    if nargin < 3 || isempty(block_size), block_size = [20 20]; end
+    if nargin < 3 || isempty(block_size), block_size = [7 7]; end
     if nargin < 4, fixed_grid_shapes = []; end
     if size(landmarks, 1) ~= 468 || size(landmarks, 2) ~= 2
         error('landmarks must have size 468 x 2.');
