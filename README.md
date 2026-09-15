@@ -133,9 +133,11 @@ python preprocessing/python/prepare_ppg_dataset.py \
   --output-root processed/teacher_ppg/4_sec \
   --clip-seconds 4 \
   --target-fs 30 \
+  --start-offset-seconds 0 \
   --nan-policy drop \
   --normalisation none
 ```
+This preparation is used for independent training of `N_PPG`. The complete PPG recording is used, including the first 10 seconds.
 
 No signal normalization is imposed by default because the accepted manuscript does not specify one. The option can be changed to `zscore` or `minmax` when reproducing a separately recorded laboratory configuration.
 
@@ -237,20 +239,41 @@ processed/student/HQ/4_sec/subject_001/
 The ROI block size used for the reported experiments is `7 × 7` pixels.
 To reduce noise, the first and last 10 seconds of each video are excluded. From the remaining 70 seconds, 17 complete non-overlapping 4-second clips are retained, while the final 2 seconds are discarded.
 
-## 3.4 Match synchronized PPG clips
+## 3.4 Prepare and match synchronized PPG clips
 
-Prepare the BP-rPPG contact PPG using Step 1 with matching `dataset`, `subject_id`, `video_id`, and `clip_index`. Then merge it into each video-quality folder:
+The PPG preprocessing differs between independent PPG-network training and PPG-guided rPPG-network training.
+
+During the independent training of `N_PPG`, the complete PPG recording is used, including the first 10 seconds. During the PPG-guided training of `N_rPPG`, the facial-video preprocessing excludes the first 10 seconds. Therefore, a separate set of PPG clips must be prepared with a 10-second start offset to maintain temporal alignment with the video clips.
+
+For the aligned data, video `clip_index = 0` corresponds to the PPG interval from 10 to 14 seconds, `clip_index = 1` corresponds to the interval from 14 to 18 seconds, and so forth.
+
+Prepare the aligned PPG clips using:
+
+```bash
+python preprocessing/python/prepare_ppg_dataset.py \
+  --manifest manifests/bp_rppg_student_ppg.csv \
+  --output-root processed/student_ppg/4_sec \
+  --clip-seconds 4 \
+  --target-fs 30 \
+  --start-offset-seconds 10 \
+  --nan-policy drop \
+  --normalisation none
+```
+
+The resulting PPG clips are separate from those stored in `processed/teacher_ppg/4_sec`, which are prepared from the complete recordings for independent `N_PPG` training.
+
+Merge the temporally aligned PPG clips with the corresponding rPPG clips:
 
 ```bash
 python preprocessing/python/merge_student_modalities.py \
   --student-root processed/student \
   --quality HQ \
-  --ppg-root processed/teacher_ppg/4_sec
+  --ppg-root processed/student_ppg/4_sec
 ```
 
-Repeat for `LQ`, `C_23`, and `C_40`. The script matches clips by metadata rather than silently assuming row order.
+Repeat the merge step for `LQ`, `C_23`, and `C_40`. The aligned PPG data need to be prepared only once because all four video-quality variants have the same temporal alignment. The merge script matches clips using `dataset`, `subject_id`, `video_id`, `clip_index`, and `start_time_sec`.
 
-Validate the student training data:
+Validate the prepared student-training data:
 
 ```bash
 python preprocessing/python/validate_processed_data.py student \
@@ -261,6 +284,9 @@ python preprocessing/python/validate_processed_data.py student \
   --k-signals 15 \
   --require-ppg
 ```
+
+Repeat the validation for the remaining video-quality conditions as required.
+
 
 # Step 4: Train the ALIVE student
 
