@@ -4,7 +4,7 @@ function plot_landmarks_on_frame(video_path, landmarks_csv, frame_number)
     row = landmarks(frame_number, :);
     frame = read(VideoReader(video_path), frame_number);
     points = reshape(row, 2, [])';
-    [rois, ~] = define_face_rois(points, [size(frame, 1) size(frame, 2)], [20 20], []);
+    [rois, ~] = define_face_rois(points, [size(frame, 1) size(frame, 2)], [7 7], []);
 
     figure; imshow(frame); hold on;
     plot(points(:, 1), points(:, 2), 'g.', 'MarkerSize', 5);
