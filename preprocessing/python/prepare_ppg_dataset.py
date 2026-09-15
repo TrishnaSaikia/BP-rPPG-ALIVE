@@ -150,10 +150,23 @@ def main() -> None:
     parser.add_argument("--output-root", default="processed/teacher_ppg/4_sec")
     parser.add_argument("--clip-seconds", type=float, default=4.0)
     parser.add_argument("--target-fs", type=float, default=30.0)
+    parser.add_argument(
+    "--start-offset-seconds",
+    type=float,
+    default=0.0,
+    help=(
+        "Time offset from the beginning of the source PPG recording. "
+        "Use 0 for independent PPG-network training and 10 for "
+        "PPG clips synchronized with the trimmed BP-rPPG videos."
+    ),
+    )
     parser.add_argument("--nan-policy", choices=["drop", "interpolate", "error"], default="drop")
     parser.add_argument("--normalisation", choices=["none", "zscore", "minmax"], default="none")
     parser.add_argument("--overwrite", action="store_true")
     args = parser.parse_args()
+
+    if args.start_offset_seconds < 0:
+    raise ValueError("--start-offset-seconds must be non-negative")
 
     manifest_path = Path(args.manifest)
     manifest = pd.read_csv(
@@ -193,14 +206,28 @@ def main() -> None:
         if source_fs <= 0:
             raise ValueError(f"Invalid sampling_rate at manifest row {row_number}: {source_fs}")
         signal = _load_signal(row, manifest_path.parent)
+        offset_samples = int(round(args.start_offset_seconds * source_fs))
+
+        if offset_samples >= len(signal):
+            raise ValueError(
+                f"Start offset of {args.start_offset_seconds:g} seconds "
+                f"exceeds the signal duration for "
+                f"{dataset}/{subject_id}/{video_id}"
+        )
+
+signal = signal[offset_samples:]
 
         duration_seconds = len(signal) / source_fs
         n_clips = int(math.floor(duration_seconds / args.clip_seconds))
         for clip_index in range(n_clips):
-            start_time = clip_index * args.clip_seconds
-            end_time = (clip_index + 1) * args.clip_seconds
-            start_sample = int(round(start_time * source_fs))
-            end_sample = int(round(end_time * source_fs))
+            relative_start_time = clip_index * args.clip_seconds
+            relative_end_time = (clip_index + 1) * args.clip_seconds
+            
+            start_time = args.start_offset_seconds + relative_start_time
+            end_time = args.start_offset_seconds + relative_end_time
+            
+            start_sample = int(round(relative_start_time * source_fs))
+            end_sample = int(round(relative_end_time * source_fs))
             raw_clip = signal[start_sample:end_sample]
             if len(raw_clip) < 2:
                 dropped_clips += 1
@@ -219,16 +246,17 @@ def main() -> None:
             bucket["labels"].append([float(row["sbp"]), float(row["dbp"])])
             bucket["metadata"].append(
                 {
-                    "dataset": dataset,
-                    "subject_id": subject_id,
-                    "video_id": video_id,
-                    "clip_index": clip_index,
-                    "start_time_sec": start_time,
-                    "end_time_sec": end_time,
-                    "source_sampling_rate": source_fs,
-                    "target_sampling_rate": args.target_fs,
-                    "source_signal_path": str(row["signal_path"]),
-                }
+                "dataset": dataset,
+                "subject_id": subject_id,
+                "video_id": video_id,
+                "clip_index": clip_index,
+                "start_time_sec": start_time,
+                "end_time_sec": end_time,
+                "source_start_offset_seconds": args.start_offset_seconds,
+                "source_sampling_rate": source_fs,
+                "target_sampling_rate": args.target_fs,
+                "source_signal_path": str(row["signal_path"]),
+            }
             )
 
     if not grouped:
