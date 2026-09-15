@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Match prepared PPG clips to rPPG clips using metadata keys.
+"""Match prepared PPG clips with temporally corresponding rPPG clips.
 
-The rPPG MATLAB pipeline writes rppg_topk.csv, clip_quality.csv, labels.csv
-and metadata.csv. The PPG preparation script writes ppg.csv, labels.csv and
-metadata.csv. This utility matches rows by dataset, subject_id, video_id and
-clip_index, then writes the synchronized ppg.csv into each student subject
-folder. Row-order matching is intentionally not used.
+The MATLAB rPPG pipeline writes rppg_topk.csv, clip_quality.csv, labels.csv,
+and metadata.csv. The PPG preparation script writes ppg.csv, labels.csv, and
+metadata.csv. This utility matches clips using dataset, subject_id, video_id,
+clip_index, and start_time_sec. Including start_time_sec ensures that PPG and
+rPPG clips from different recording intervals are not paired.
 """
 
 from __future__ import annotations
@@ -16,7 +16,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-KEYS = ["dataset", "subject_id", "video_id", "clip_index"]
+KEYS = [
+    "dataset",
+    "subject_id",
+    "video_id",
+    "clip_index",
+    "start_time_sec",
+]
 
 
 def main() -> None:
