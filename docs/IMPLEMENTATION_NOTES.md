@@ -4,7 +4,9 @@ This repository encodes every architecture, training and testing detail that is 
 
 ## PPG sampling frequency
 
-All PPG sources are segmented into non-overlapping 4-second clips and resampled to a common frequency. The default target is **30 Hz**, giving 120 samples per clip. This matches the 30 fps rPPG input and ensures that the PPG feature representation `F_p` and rPPG feature representation `F_r` both have length `L=120` for the feature-alignment loss.
+The `Wave` column in the BP-rPPG `<subject>_U_wave.csv` files contains the raw pulse waveform exported by the pulse-oximeter software. The BP-rPPG waveform is treated as being sampled at approximately 60 Hz.
+
+All PPG sources are resampled to a common target frequency of 30 Hz. Consequently, each 4-second processed PPG clip contains 120 samples. This matches the 30 fps rPPG clips and ensures that the PPG feature representation `F_p` and rPPG feature representation `F_r` have the same temporal length.
 
 ## M-TCN downsampling layer
 
@@ -18,8 +20,6 @@ The paper shows MLP layers and dropout operations but does not report their nume
 - `model.dropout: 0.01`
 
 They can be changed without editing model code. Replace these defaults with the exact experiment values if a separate laboratory record is available.
-
-## ROI landmark indices and block size
 
 ## ROI landmark indices and block size
 
